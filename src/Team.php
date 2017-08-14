@@ -7,6 +7,10 @@ class Team extends AbstractItem
     public $teamcode;
     public $teamnaam;
     public $lokaleteamcode;
+    public $geslacht;
+    public $teamsoort;
+    public $leeftijdscategorie;
+    public $speeldagteam;
 
     /** @var array $competitions */
     private $competitions = [];
@@ -20,16 +24,21 @@ class Team extends AbstractItem
     }
 
     /**
-     * All competitions where this team is active in
+     * All competitions where this team is active in.
      *
      * @return array
      */
     public function getCompetitions()
     {
-        if ($this->competitions) {
+        if (count($this->competitions) != 0) {
             return $this->competitions;
         }
 
+        /**
+         * According to Sportlink, this also gets inactive poules
+         * Therefor we filter the main competition array on
+         * the Club entity.
+         *
         $response = $this->api->request('teampoulelijst', [
             'teamcode' => $this->teamcode,
             'lokaleteamcode' => $this->lokaleteamcode,
@@ -41,6 +50,13 @@ class Team extends AbstractItem
 
             $competition = $this->api->map($item, new Competition($this->api));
             $this->competitions[$competition->poulecode] = $competition;
+        }
+         */
+
+        foreach($this->api->getClub()->getCompetitions() as $competition) {
+            if($competition->teamcode == $this->teamcode) {
+                $this->competitions[] = $competition;
+            }
         }
 
         return  $this->competitions;

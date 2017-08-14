@@ -5,9 +5,15 @@ namespace PendoNL\ClubDataservice;
 class Competition extends AbstractItem
 {
     public $poulecode;
-    public $poulenaam;
-    public $teamnaam;
     public $teamcode;
+    public $competitienaam;
+    public $klasse;
+    public $poule;
+    public $klassepoule;
+    public $spelsoort;
+    public $competitiesoort;
+    public $kalespelsoort;
+    public $speeldag;
 
     private $results = [];
     private $fixtures = [];
@@ -19,6 +25,16 @@ class Competition extends AbstractItem
     public function __construct(Api $api)
     {
         $this->api = $api;
+    }
+
+    /**
+     * Get the team from the parent.
+     *
+     * @return mixed
+     */
+    public function getTeam()
+    {
+        return $this->api->getClub()->getTeam($this->teamcode);
     }
 
     /**
@@ -86,6 +102,7 @@ class Competition extends AbstractItem
         ], $arguments));
 
         foreach($response as $item) {
+            var_dump($item);exit;
             $tablePosition = $this->api->map($item, new TablePosition($this->api));
             $this->table[$item['positie']] = $tablePosition;
         }

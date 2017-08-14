@@ -48,6 +48,7 @@ class Club extends AbstractItem
 
     /** @var array $teams */
     private $teams = [];
+    private $competitions = [];
     private $afgelastingen = [];
 
     /**
@@ -59,7 +60,8 @@ class Club extends AbstractItem
     }
 
     /**
-     * Teams van de club
+     * Return all teams (and map competitions).
+     *
      * @param array $arguments
      * @return array
      */
@@ -71,6 +73,7 @@ class Club extends AbstractItem
 
         $response = $this->api->request('teams', $arguments);
 
+        // First loop the teams
         foreach($response as $item) {
             $team = $this->api->map($item, new Team($this->api));
 
@@ -79,10 +82,32 @@ class Club extends AbstractItem
             }
         }
 
+        // Then loop the competitions
+        foreach($response as $item) {
+            $competition = $this->api->map($item, new Competition($this->api));
+            $this->competitions[$competition->poulecode] = $competition;
+        }
+
         return  $this->teams;
     }
 
     /**
+     * Return all competitions.
+     *
+     * @return array
+     */
+    public function getCompetitions()
+    {
+        if(count($this->teams) == 0) {
+            $this->getTeams();
+        }
+
+        return $this->competitions;
+    }
+
+    /**
+     * Return a single team.
+     *
      * @param  string $code
      * @return Team|null
      */
@@ -93,10 +118,30 @@ class Club extends AbstractItem
         if (isset($teams[$code])) {
             return $teams[$code];
         }
+
+        return null;
     }
 
     /**
-     * Afgelastingen
+     * Return a single competition.
+     *
+     * @param  string $code
+     * @return Team|null
+     */
+    public function getCompetition($code)
+    {
+        $competitions = $this->getCompetitions();
+
+        if (isset($competitions[$code])) {
+            return $competitions[$code];
+        }
+
+        return null;
+    }
+
+    /**
+     * Afgelastingen.
+     *
      * @param array $arguments
      * @return array
      */
