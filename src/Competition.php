@@ -18,6 +18,8 @@ class Competition extends AbstractItem
     private $results = [];
     private $fixtures = [];
     private $table = [];
+    private $periodTables = [];
+    private $periods = [];
 
     /**
      * @param Api $api
@@ -35,6 +37,34 @@ class Competition extends AbstractItem
     public function getTeam()
     {
         return $this->api->getClub()->getTeam($this->teamcode);
+    }
+
+    /**
+     * Get the periods by a competition
+     *
+     * @param array $arguments
+     * @return array
+     */
+    public function periods($arguments = [])
+    {
+        if ($this->periods) {
+            return $this->periods;
+        }
+
+        // Add -1 period (this is the full table)
+        $periode = $this->api->map(json_encode(['waarde' => -1, 'omschrijving' => -1, 'huidig' => 'nee']));
+        $this->periods[$periode->waarde] = $periode;
+
+        $response = $this->api->request('keuzelijst-periodenummers', array_merge([
+            'poulecode' => $this->poulecode,
+        ], $arguments));
+
+        foreach($response as $item) {
+            $periode = $this->api->map($item, new Period($this->api));
+            $this->periods[$periode->waarde] = $periode;
+        }
+
+        return  $this->periods;
     }
 
     /**
@@ -102,7 +132,6 @@ class Competition extends AbstractItem
         ], $arguments));
 
         foreach($response as $item) {
-            var_dump($item);exit;
             $tablePosition = $this->api->map($item, new TablePosition($this->api));
             $this->table[$item['positie']] = $tablePosition;
         }
@@ -110,6 +139,54 @@ class Competition extends AbstractItem
         ksort($this->table);
 
         return $this->table;
+    }
+
+    /**
+     * Get period tables.
+     *
+     * @param array $arguments
+     * @return array
+     */
+    public function periodTables($arguments = [])
+    {
+        if ($this->periodTables) {
+            return $this->periodTables;
+        }
+
+        foreach($this->periods() as $period) {
+            $response = $this->api->request('periodestand', array_merge([
+                'poulecode' => $this->poulecode,
+                'periodenummer' => $period,
+            ], $arguments));
+
+            foreach($response as $item) {
+                $tablePosition = $this->api->map($item, new TablePosition($this->api));
+                $this->periodTables[$period->waarde][$item['positie']] = $tablePosition;
+            }
+
+            ksort($this->periodTables[$period->waarde]);
+        }
+
+        return $this->periodTables;
+    }
+
+    /**
+     * Return period table.
+     *
+     * @param $period
+     * @return mixed|null
+     */
+    public function getPeriod($period)
+    {
+        if(count($this->periodTables) == 0) {
+            $this->periodTables();
+        }
+
+        if(array_key_exists($period, $this->periodTables)) {
+            return $this->periodTables[$period];
+        }
+
+        return null;
     }
 
     /**
