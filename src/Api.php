@@ -35,7 +35,9 @@ class Api
     {
         $this->api_key = $api_key;
         $this->client = $client ?: new HttpClient();
+
         $this->mapper = new JsonMapper();
+        $this->mapper->bStrictNullTypes = false;
     }
 
     /**

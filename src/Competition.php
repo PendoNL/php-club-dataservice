@@ -52,7 +52,7 @@ class Competition extends AbstractItem
         }
 
         // Add -1 period (this is the full table)
-        $periode = $this->api->map(json_encode(['waarde' => -1, 'omschrijving' => -1, 'huidig' => 'nee']));
+        $periode = $this->api->map(json_encode(['waarde' => -1, 'omschrijving' => -1, 'huidig' => 'nee']), new Period($this->api));
         $this->periods[$periode->waarde] = $periode;
 
         $response = $this->api->request('keuzelijst-periodenummers', array_merge([
@@ -127,18 +127,22 @@ class Competition extends AbstractItem
             return $this->table;
         }
 
-        $response = $this->api->request('poulestand', array_merge([
-            'poulecode' => $this->poulecode,
-        ], $arguments));
+        if (!is_null($this->poulecode)) {
+            $response = $this->api->request('poulestand', array_merge([
+                'poulecode' => $this->poulecode,
+            ], $arguments));
 
-        foreach($response as $item) {
-            $tablePosition = $this->api->map($item, new TablePosition($this->api));
-            $this->table[$item['positie']] = $tablePosition;
+            foreach($response as $item) {
+                $tablePosition = $this->api->map($item, new TablePosition($this->api));
+                $this->table[$item['positie']] = $tablePosition;
+            }
+
+            ksort($this->table);
+
+            return $this->table;
         }
 
-        ksort($this->table);
-
-        return $this->table;
+        return false;
     }
 
     /**
