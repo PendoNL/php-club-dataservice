@@ -4,24 +4,8 @@ namespace PendoNL\ClubDataservice;
 
 class Team extends AbstractItem
 {
-    public $teamcode;
-    public $teamnaam;
-    public $lokaleteamcode;
-    public $geslacht;
-    public $teamsoort;
-    public $leeftijdscategorie;
-    public $speeldagteam;
-
     /** @var array $competitions */
     private $competitions = [];
-
-    /**
-     * @param Api $api
-     */
-    public function __construct($api)
-    {
-        $this->api = $api;
-    }
 
     /**
      * All competitions where this team is active in.

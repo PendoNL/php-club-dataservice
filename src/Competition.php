@@ -4,30 +4,11 @@ namespace PendoNL\ClubDataservice;
 
 class Competition extends AbstractItem
 {
-    public $poulecode;
-    public $teamcode;
-    public $competitienaam;
-    public $klasse;
-    public $poule;
-    public $klassepoule;
-    public $spelsoort;
-    public $competitiesoort;
-    public $kalespelsoort;
-    public $speeldag;
-
     private $results = [];
     private $fixtures = [];
     private $table = [];
     private $periodTables = [];
     private $periods = [];
-
-    /**
-     * @param Api $api
-     */
-    public function __construct(Api $api)
-    {
-        $this->api = $api;
-    }
 
     /**
      * Get the team from the parent.
@@ -36,7 +17,9 @@ class Competition extends AbstractItem
      */
     public function getTeam()
     {
-        return $this->api->getClub()->getTeam($this->teamcode);
+        $team = $this->api->getClub()->getTeam($this->teamcode);
+
+        return $team;
     }
 
     /**
@@ -52,7 +35,7 @@ class Competition extends AbstractItem
         }
 
         // Add -1 period (this is the full table)
-        $periode = $this->api->map(json_encode(['waarde' => -1, 'omschrijving' => -1, 'huidig' => 'nee']), new Period($this->api));
+        $periode = new Period($this->api, ['waarde' => -1, 'omschrijving' => -1, 'huidig' => 'nee']);
         $this->periods[$periode->waarde] = $periode;
 
         $response = $this->api->request('keuzelijst-periodenummers', array_merge([
@@ -60,7 +43,7 @@ class Competition extends AbstractItem
         ], $arguments));
 
         foreach($response as $item) {
-            $periode = $this->api->map($item, new Period($this->api));
+            $periode = new Period($this->api, $item);
             $this->periods[$periode->waarde] = $periode;
         }
 
@@ -81,38 +64,15 @@ class Competition extends AbstractItem
 
         $response = $this->api->request('poule-programma', array_merge([
             'poulecode' => $this->poulecode,
+            'aantaldagen' => 365,
         ], $arguments));
 
         foreach($response as $item) {
-            $fixture = $this->api->map($item, new Match($this->api));
-            $this->fixtures[$fixture->wedstrijdcode] = $fixture;
+            $match = new Match($this->api, $item);
+            $this->fixtures[$match->wedstrijdcode] = $match;
         }
 
-        return  $this->fixtures;
-    }
-
-    /**
-     * Results for this competition
-     *
-     * @param array $arguments
-     * @return array
-     */
-    public function results($arguments = [])
-    {
-        if ($this->results) {
-            return $this->results;
-        }
-
-        $response = $this->api->request('pouleuitslagen', array_merge([
-            'poulecode' => $this->poulecode,
-        ], $arguments));
-
-        foreach($response as $item) {
-            $result = $this->api->map($item, new Match($this->api));
-            $this->results[$result->wedstrijdcode] = $result;
-        }
-
-        return  $this->results;
+        return $this->fixtures;
     }
 
     /**
@@ -133,7 +93,7 @@ class Competition extends AbstractItem
             ], $arguments));
 
             foreach($response as $item) {
-                $tablePosition = $this->api->map($item, new TablePosition($this->api));
+                $tablePosition = new TablePosition($this->api, $item);
                 $this->table[$item['positie']] = $tablePosition;
             }
 
@@ -142,7 +102,31 @@ class Competition extends AbstractItem
             return $this->table;
         }
 
-        return false;
+        return [];
+    }
+
+    /**
+     * Results for this competition
+     *
+     * @param array $arguments
+     * @return array
+     */
+    public function results($arguments = [])
+    {
+        if ($this->results) {
+            return $this->results;
+        }
+
+        $response = $this->api->request('pouleuitslagen', array_merge([
+            'poulecode' => $this->poulecode,
+        ], $arguments));
+
+        foreach($response as $item) {
+            $result = new Match($this->api, $item);
+            $this->results[$result->wedstrijdcode] = $result;
+        }
+
+        return  $this->results;
     }
 
     /**
@@ -160,11 +144,11 @@ class Competition extends AbstractItem
         foreach($this->periods() as $period) {
             $response = $this->api->request('periodestand', array_merge([
                 'poulecode' => $this->poulecode,
-                'periodenummer' => $period,
+                'periodenummer' => $period->waarde,
             ], $arguments));
 
             foreach($response as $item) {
-                $tablePosition = $this->api->map($item, new TablePosition($this->api));
+                $tablePosition = new TablePosition($this->api, $item);
                 $this->periodTables[$period->waarde][$item['positie']] = $tablePosition;
             }
 

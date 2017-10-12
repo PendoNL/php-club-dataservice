@@ -4,60 +4,8 @@ namespace PendoNL\ClubDataservice;
 
 class Club extends AbstractItem
 {
-    /** @vars logo */
-    public $logo;
-    public $kleinlogo;
-
-    /** @vars club */
-    public $clubcode;
-    public $clubnaam;
-    public $informatie;
-    public $oprichtingsdatum;
-    public $oprichtingsdatetime;
-    public $naamsecretaris;
-    public $kvknummer;
-
-    /** @vars contact */
-    public $telefoonnummer;
-    public $fax;
-    public $email;
-    public $website;
-    public $straatnaam;
-    public $huisnummer;
-    public $huisnummertoevoeging;
-    public $postcode;
-    public $plaats;
-
-    /** @var Bezoekadres */
-    public $bezoekadres;
-
-    /** @vars bank */
-    public $banknummer;
-    public $tennamevan;
-    public $tennamevanplaats;
-
-    /** @vars thuistenue */
-    public $thuisshirtkleur;
-    public $thuisbroekkleur;
-    public $thuissokkenkleur;
-
-    /** @vars uittenue */
-    public $uitshirtkleur;
-    public $uitbroekkleur;
-    public $uitsokkenkleur;
-
-    /** @var array $teams */
-    private $teams = [];
-    private $competitions = [];
-    private $afgelastingen = [];
-
-    /**
-     * @param Api $api
-     */
-    public function __construct(Api $api)
-    {
-        $this->api = $api;
-    }
+    public $teams = [];
+    public $afgelastingen = [];
 
     /**
      * Return all teams (and map competitions).
@@ -75,7 +23,7 @@ class Club extends AbstractItem
 
         // First loop the teams
         foreach($response as $item) {
-            $team = $this->api->map($item, new Team($this->api));
+            $team = new Team($this->api, $item);
 
             if(!array_key_exists($team->teamcode, $this->teams)) {
                 $this->teams[$team->teamcode] = $team;
@@ -84,7 +32,7 @@ class Club extends AbstractItem
 
         // Then loop the competitions
         foreach($response as $item) {
-            $competition = $this->api->map($item, new Competition($this->api));
+            $competition = new Competition($this->api, $item);
             $this->competitions[$competition->poulecode] = $competition;
         }
 
@@ -113,10 +61,12 @@ class Club extends AbstractItem
      */
     public function getTeam($code)
     {
-        $teams = $this->getTeams();
+        if(count($this->teams) == 0) {
+            $this->getTeams();
+        }
 
-        if (isset($teams[$code])) {
-            return $teams[$code];
+        if (isset($this->teams[$code])) {
+            return $this->teams[$code];
         }
 
         return null;
@@ -154,7 +104,7 @@ class Club extends AbstractItem
         $response = $this->api->request('afgelastingen', $arguments);
 
         foreach($response as $item){
-            $afgelasting = $this->api->map($item, new Match($this->api));
+            $afgelasting = new Match($this->api, $item);
             $this->afgelastingen[] = $afgelasting;
         }
 

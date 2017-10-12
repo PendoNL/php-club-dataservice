@@ -35,9 +35,6 @@ class Api
     {
         $this->api_key = $api_key;
         $this->client = $client ?: new HttpClient();
-
-        $this->mapper = new JsonMapper();
-        $this->mapper->bStrictNullTypes = false;
     }
 
     /**
@@ -76,19 +73,6 @@ class Api
     }
 
     /**
-     * Map data to object
-     *
-     * @param $json
-     * @param $object
-     * @return object
-     * @throws \JsonMapper_Exception
-     */
-    public function map($json, $object)
-    {
-        return $this->mapper->map((object) $json, $object);
-    }
-
-    /**
      * Get the club data
      *
      * @return Club
@@ -103,10 +87,10 @@ class Api
 
         $data = $response['gegevens'];
         if (isset($response['bezoekadres'])) {
-            $data['bezoekadres'] = (object)$response['bezoekadres'];
+            $data['bezoekadres'] = new Bezoekadres($this, $response['bezoekadres']);
         }
 
-        $this->club = $this->map($data, new Club($this));
+        $this->club = new Club($this, $data);
 
         return $this->club;
     }
