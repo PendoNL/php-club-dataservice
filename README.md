@@ -5,7 +5,7 @@ This package contains a PHP wrapper around the Sportlink Club.Dataservice API. I
 
 Install the package using composer:
 ```
-composer require pendonl/php-club-dataservice:dev-master
+composer require pendonl/php-club-dataservice
 ```
 
 Require the vendor/autoload.php file:
@@ -16,7 +16,7 @@ require 'vendor/autoload.php';
 Create an instance of the API using your Sportlink Club.Dataservice Client ID:
 ```
 use \PendoNL\ClubDataservice\Api as KnvbApi;
-$api = new Api('client_id');
+$api = new KnvbApi('client_id');
 ```
 
 It al starts by getting the club details.
@@ -24,22 +24,26 @@ It al starts by getting the club details.
 $club = $api->getClub()
 ```
 
-All properties are made public, so you are free to use `$club->clubnaam` for example. Once you get the club details you can proceed by requesting the teams and related entities.
+All properties - similar to the json response provided by the API - are made public, so you are free to use `$club->clubnaam` for example. Once you get the club details you can proceed by requesting the teams and related entities.
 
 ```
 $teams = $club->getTeams();
 foreach($teams as $team) {
 
+    // $team->teamnaam;
+
     // Get competitions
-    $competitions = $team->getCompetitions();
+    $competitions = $team->competitions();
     
     foreach($competitions as $competition) {
     
+        // $competition->competitienaam;
+    
         // Fixtures
-        $competition->getFixtures();
+        $competition->fixtures();
         
         // Results
-        $competition->getResults();
+        $competition->results();
         
         // Table standings
         $competition->table();
@@ -49,12 +53,9 @@ foreach($teams as $team) {
 }
 ```
 
-There are still methods left to add (like getting results and fixtures from the Club entitity).
-
 ### Thanks to
 
-- [@barryvdh](https://github.com/barryvdh)
-- [KNVB Dataservice API Wrapper](https://github.com/fruitcake/php-knvb-dataservice-api) by @barryvdh
+- [KNVB Dataservice API Wrapper](https://github.com/fruitcake/php-knvb-dataservice-api) by @barryvdh - for providing a basis for this API wrapper.
 
 ### Security
 
