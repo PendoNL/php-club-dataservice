@@ -119,6 +119,8 @@ class Competition extends AbstractItem
 
         $response = $this->api->request('pouleuitslagen', array_merge([
             'poulecode' => $this->poulecode,
+            'aantaldagen' => 31,
+            'weekoffset' => "-4",
         ], $arguments));
 
         foreach($response as $item) {
