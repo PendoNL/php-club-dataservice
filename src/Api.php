@@ -23,7 +23,7 @@ class Api
      *
      * @var string
      */
-    private $api_key = '';
+    protected $api_key = '';
 
     /**
      * ClubDataservice constructor.
@@ -93,5 +93,21 @@ class Api
         $this->club = new Club($this, $data);
 
         return $this->club;
+    }
+
+    /**
+     * @return string
+     */
+    public function getApiKey()
+    {
+        return $this->api_key;
+    }
+
+    /**
+     * @param string $api_key
+     */
+    public function setApiKey($api_key)
+    {
+        $this->api_key = $api_key;
     }
 }
