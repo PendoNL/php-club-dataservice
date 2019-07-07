@@ -83,12 +83,12 @@ class Api
      *
      * @param $parameters
      * @return string
-     * @throws \InvalidArgumentException
+     * @throws \Exception
      */
     protected function buildQueryData($parameters)
     {
         if (empty($this->api_key)) {
-            throw new InvalidArgumentException("No 'api_key' set");
+            throw new \Exception("No 'api_key' set");
         }
 
         return http_build_query(array_merge(['client_id' => $this->api_key], $parameters));
