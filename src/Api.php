@@ -52,6 +52,8 @@ class Api
     public function setApiKey($api_key)
     {
         $this->api_key = $api_key;
+
+        return $this;
     }
 
     /**
