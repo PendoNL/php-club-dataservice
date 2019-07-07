@@ -2,6 +2,7 @@
 
 namespace PendoNL\ClubDataservice;
 
+use http\Exception\InvalidArgumentException;
 use JsonMapper;
 use PendoNL\ClubDataservice\HttpClient\HttpClient;
 use PendoNL\ClubDataservice\HttpClient\HttpClientInterface;
@@ -31,10 +32,26 @@ class Api
      * @param $api_key
      * @param HttpClientInterface $client
      */
-    public function __construct($api_key, HttpClientInterface $client = null)
+    public function __construct($api_key = '', HttpClientInterface $client = null)
     {
         $this->api_key = $api_key;
         $this->client = $client ?: new HttpClient();
+    }
+
+    /**
+     * @return string
+     */
+    public function getApiKey()
+    {
+        return $this->api_key;
+    }
+
+    /**
+     * @param string $api_key
+     */
+    public function setApiKey($api_key)
+    {
+        $this->api_key = $api_key;
     }
 
     /**
@@ -43,7 +60,7 @@ class Api
      * @param $path
      * @param array $parameters
      * @return mixed
-     * @throws InvalidResponseException
+     * @throws InvalidResponseException|\InvalidArgumentException
      */
     public function request($path, $parameters = [])
     {
@@ -66,9 +83,14 @@ class Api
      *
      * @param $parameters
      * @return string
+     * @throws \InvalidArgumentException
      */
-    private function buildQueryData($parameters)
+    protected function buildQueryData($parameters)
     {
+        if (empty($this->api_key)) {
+            throw new InvalidArgumentException("No 'api_key' set");
+        }
+
         return http_build_query(array_merge(['client_id' => $this->api_key], $parameters));
     }
 
@@ -93,21 +115,5 @@ class Api
         $this->club = new Club($this, $data);
 
         return $this->club;
-    }
-
-    /**
-     * @return string
-     */
-    public function getApiKey()
-    {
-        return $this->api_key;
-    }
-
-    /**
-     * @param string $api_key
-     */
-    public function setApiKey($api_key)
-    {
-        $this->api_key = $api_key;
     }
 }
