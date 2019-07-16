@@ -19,9 +19,10 @@ use \PendoNL\ClubDataservice\Api as KnvbApi;
 $api = new KnvbApi('client_id');
 ```
 
-##### New feature in this fork
+##### Setting the API key later (DI)
 
 You can set the 'api_key' later. So you can use it better with dependency injection. Here's an example:
+
 ```php
 // app/Providers/AppServiceProvider.php
 
