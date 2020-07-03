@@ -14,6 +14,7 @@ class HttpClient implements HttpClientInterface
      */
     protected $options = [
         'base_uri' => 'https://data.sportlink.com/',
+        'verify' => 'false',
         'defaults' => [
             'timeout' => 30,
             'headers' => [
