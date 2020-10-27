@@ -1,5 +1,5 @@
 {
-    "name": "pendonl/php-club-dataservice",
+    "name": "dsmink/php-club-dataservice",
     "description": "PHP wrapper around the Sportlink Club.Dataservice API",
     "type": "library",
     "license": "MIT",
