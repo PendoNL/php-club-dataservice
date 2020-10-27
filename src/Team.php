@@ -7,6 +7,9 @@ class Team extends AbstractItem
     /** @var array $competitions */
     private $competitions = [];
 
+    /** @var TeamMember[]|array $teamMembers */
+    private $teamMembers = [];
+
     /**
      * All competitions where this team is active in.
      *
@@ -25,5 +28,28 @@ class Team extends AbstractItem
         }
 
         return  $this->competitions;
+    }
+
+    /**
+     * Get all team members.
+     * 
+     * @return TeamMember[]|array
+     */
+    public function getMembers()
+    {
+        if (count($this->teamMembers) != 0) {
+            return $this->teamMembers;
+        }
+
+        $membersData = $this->api->request('team-indeling', [
+            'teamcode' => $this->teamcode,
+            'lokaleteamcode' => $this->lokaleteamcode,
+        ]);
+
+        foreach ($membersData as $memberData) {
+            $this->teamMembers[] = new TeamMember($this->api, $memberData);
+        }
+
+        return $this->teamMembers;
     }
 }
