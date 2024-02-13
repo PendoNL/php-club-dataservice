@@ -36,6 +36,8 @@ class Api
     {
         $this->api_key = $api_key;
         $this->client = $client ?: new HttpClient();
+
+        $this->setTimeZone();
     }
 
     /**
@@ -52,6 +54,18 @@ class Api
     public function setApiKey($api_key)
     {
         $this->api_key = $api_key;
+
+        return $this;
+    }
+
+    /**
+     * @param string $timezone
+     *
+     * @sse https://www.php.net/manual/en/timezones.php
+     */
+    public function setTimeZone($timezone = 'Europe/Amsterdam')
+    {
+        date_default_timezone_set($timezone);
 
         return $this;
     }

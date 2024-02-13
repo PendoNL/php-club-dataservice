@@ -2,8 +2,33 @@
 
 namespace PendoNL\ClubDataservice;
 
+use PendoNL\ClubDataservice\Exception\InvalidResponseException;
+
+/**
+ * @property-read int|string $lokaleteamcode     The local team code.
+ * @property-read int        $poulecode          The poul code.
+ * @property-read string     $teamnaam           The name of the team.
+ * @property-read string     $compeitienaam      The team competition name.
+ * @property-read string     $klasse             The team order.
+ * @property-read string     $poule              The team poule.
+ * @property-read string     $klassepoule        The team poule order.
+ * @property-read string     $spelsoort          The team game/day.
+ * @property-read string     $competitiesoort    Competition type.
+ * @property-read string     $geslacht           The team gender.
+ * @property-read string     $teamsoort          Type of team.
+ * @property-read string     $leeftijdscategorie Team age category.
+ * @property-read string     $kalespelsoort      Team "kalespel" type.
+ * @property-read string     $speeldag           Team day of game.
+ * @property-read string     $speeldagteam       $speeldag + "speeldag".
+ * @property-read string     $more               API more link.
+ *
+ * @see https://dexels.github.io/navajofeeds-json-parser/article/?teams
+ */
 class Team extends AbstractItem
 {
+    /** @var int|null */
+    public $teamcode;
+
     /** @var array $competitions */
     private $competitions = [];
 
@@ -32,8 +57,10 @@ class Team extends AbstractItem
 
     /**
      * Get all team members.
-     * 
+     *
      * @return TeamMember[]|array
+     *
+     * @throws InvalidResponseException
      */
     public function getMembers()
     {
@@ -41,7 +68,7 @@ class Team extends AbstractItem
             return $this->teamMembers;
         }
 
-        $membersData = $this->api->request('team-indeling', [
+        $membersData = $this->api->request(TeamMember::ARTICLE, [
             'teamcode' => $this->teamcode,
             'lokaleteamcode' => $this->lokaleteamcode,
         ]);
