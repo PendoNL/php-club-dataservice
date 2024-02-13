@@ -68,7 +68,7 @@ class Competition extends AbstractItem
         ], $arguments));
 
         foreach($response as $item) {
-            $match = new Match($this->api, $item);
+            $match = new Game($this->api, $item);
             $this->fixtures[$match->wedstrijdcode] = $match;
         }
 
@@ -124,7 +124,7 @@ class Competition extends AbstractItem
         ], $arguments));
 
         foreach($response as $item) {
-            $result = new Match($this->api, $item);
+            $result = new Game($this->api, $item);
             $this->results[$result->wedstrijdcode] = $result;
         }
 

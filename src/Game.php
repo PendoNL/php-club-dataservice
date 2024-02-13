@@ -2,6 +2,6 @@
 
 namespace PendoNL\ClubDataservice;
 
-class Match extends AbstractItem
+class Game extends AbstractItem
 {
 }

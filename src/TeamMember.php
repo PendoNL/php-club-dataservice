@@ -2,8 +2,15 @@
 
 namespace PendoNL\ClubDataservice;
 
+/**
+ * @property-read string $naam The member name.
+ *
+ * @see https://dexels.github.io/navajofeeds-json-parser/article/?team-indeling
+ */
 class TeamMember extends AbstractItem
 {
+    const ARTICLE = 'team-indeling';
+
     const SHIELDED = 'Afgeschermd';
     const UNKNOWN = 'Onbekend';
 
@@ -32,8 +39,6 @@ class TeamMember extends AbstractItem
     }
 
     /**
-     * 
-     * 
      * @return bool
      */
     public function isShielded()

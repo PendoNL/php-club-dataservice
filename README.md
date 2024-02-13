@@ -1,6 +1,9 @@
 # Sportlink Club.Dataservice
 This package contains a PHP wrapper around the Sportlink Club.Dataservice API. It aims to make working with the API a breeze.
 
+#### API
+For a list of available atricles see: `https://dexels.github.io/navajofeeds-json-parser/`.
+
 #### Installation
 
 Install the package using composer:
