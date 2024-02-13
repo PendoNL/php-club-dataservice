@@ -60,4 +60,21 @@ class CommitteeMember extends AbstractItem
     {
         return $this->lid === static::SHIELDED;
     }
+
+    /**
+     * Get team member photo.
+     *
+     * @return string|null
+     */
+    public function getImageTag()
+    {
+        if (!$this->lid) {
+            return null;
+        }
+
+        $alt = $this->lid;
+        $src = 'data:image/jpeg;base64,' . $this->foto;
+
+        return '<img alt="' . $alt . '" src="' . $src . '" />';
+    }
 }
